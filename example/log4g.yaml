@@ -20,7 +20,7 @@ outputs:
 loggers:
   - name: root
     level: info
-    outputs: ["r1", "r2"]
+    outputs: ["r1", "c1"]
   - name: a/b
     level: info
-    outputs: ["r1", "r2"]
+    outputs: ["r1", "c1"]

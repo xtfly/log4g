@@ -35,10 +35,6 @@ type notDirectoryError struct {
 	baseError
 }
 
-func newNotDirectoryError(dname string) *notDirectoryError {
-	return &notDirectoryError{baseError{message: dname + " is not directory"}}
-}
-
 func reportInternalError(err error) {
 	fmt.Fprintf(os.Stderr, "log4g internal error: %s\n", err)
 }

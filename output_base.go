@@ -90,8 +90,7 @@ func NewAynscOutput(w io.Writer, queueSize int, batchNum int) Output {
 		evtChan:  make(chan *Event, queueSize),
 		batchNum: batchNum,
 	}
-	b := &baseOutput{w: w}
-	o.baseOutput = b
+	o.baseOutput = &baseOutput{w: w}
 	return o
 }
 

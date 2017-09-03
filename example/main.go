@@ -6,7 +6,7 @@ func main() {
 
 	_ := log.GetManager().LoadConfig("log4g.yaml")
 
-	dlog := log.GetLogger("name")
+	dlog := log.GetLogger("a/b")
 	dlog.Debug("message")
 
 }
