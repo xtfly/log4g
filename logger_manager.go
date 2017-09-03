@@ -95,6 +95,8 @@ func (m *defManager) GetLoggerOutputs(name string) (ops []Output, lvl Level, err
 }
 
 func (m *defManager) LoadConfig(file string) error {
+	m.Lock()
+	defer m.Unlock()
 	bs, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
@@ -116,7 +118,17 @@ func (m *defManager) LoadConfig(file string) error {
 }
 
 func (m *defManager) SetConfig(cfg *Config) error {
+	m.Lock()
 	// TODO check the output & format relationship in config
 	m.config = cfg
+	m.Unlock()
 	return nil
+}
+
+func (m *defManager) Close() {
+	m.Lock()
+	for _, v := range m.outputs {
+		v.Close()
+	}
+	m.Unlock()
 }

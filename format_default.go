@@ -9,6 +9,9 @@ type defFormatter struct {
 
 // NewDefaultFormatter return a Formatter instance using layout formatter string
 func NewDefaultFormatter(arg *CfgFormat) (df Formatter, err error) {
+	if arg == nil {
+		panic("not set format config argument.")
+	}
 	obj := &defFormatter{
 		layout:       arg.Properties["layout"],
 		strFormatter: &StringFormatter{},

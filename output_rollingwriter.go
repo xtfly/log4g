@@ -64,36 +64,6 @@ const (
 	rollingNameModePrefix
 )
 
-var rollingNameModesStringRepresentation = map[rollingNameMode]string{
-	rollingNameModePostfix: "postfix",
-	rollingNameModePrefix:  "prefix",
-}
-
-func rollingNameModeFromString(rollingNameStr string) (rollingNameMode, bool) {
-	for tp, tpStr := range rollingNameModesStringRepresentation {
-		if tpStr == rollingNameStr {
-			return tp, true
-		}
-	}
-
-	return 0, false
-}
-
-var rollingTypesStringRepresentation = map[rollingType]string{
-	rollingTypeSize: "size",
-	rollingTypeTime: "date",
-}
-
-func rollingTypeFromString(rollingTypeStr string) (rollingType, bool) {
-	for tp, tpStr := range rollingTypesStringRepresentation {
-		if tpStr == rollingTypeStr {
-			return tp, true
-		}
-	}
-
-	return 0, false
-}
-
 // Old logs archivation type.
 type rollingArchiveType uint8
 
@@ -161,7 +131,7 @@ var compressionTypes = map[rollingArchiveType]compressionType{
 			isTar := err == nil
 
 			// Reset to beginning of file
-			if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+			if _, err := f.Seek(0, io.SeekStart); err != nil {
 				return nil, err
 			}
 			gr.Reset(f)
@@ -181,27 +151,6 @@ func (compressionType *compressionType) rollingArchiveTypeName(name string, expl
 		return name + compressionType.extension
 	}
 
-}
-
-func rollingArchiveTypeFromString(rollingArchiveTypeStr string) (rollingArchiveType, bool) {
-	for tp, tpStr := range rollingArchiveTypesStringRepresentation {
-		if tpStr == rollingArchiveTypeStr {
-			return tp, true
-		}
-	}
-
-	return 0, false
-}
-
-// Default names for different archive types
-var rollingArchiveDefaultExplodedName = "old"
-
-func rollingArchiveTypeDefaultName(archiveType rollingArchiveType, exploded bool) (string, error) {
-	compressionType, ok := compressionTypes[archiveType]
-	if !ok {
-		return "", fmt.Errorf("cannot get default filename for archive type = %v", archiveType)
-	}
-	return compressionType.rollingArchiveTypeName("log", exploded), nil
 }
 
 // rollerVirtual is an interface that represents all virtual funcs that are

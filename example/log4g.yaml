@@ -1,7 +1,7 @@
 formats:
   - name: f1
     type: format
-    layout: %{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line})
+    layout: %{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n
 outputs:
   - name: c1
     type: console

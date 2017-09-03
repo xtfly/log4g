@@ -5,7 +5,7 @@ import (
 )
 
 type memoryOutput struct {
-	*baseOutput
+	Output
 	buf bytes.Buffer
 }
 
@@ -16,6 +16,6 @@ func (o *memoryOutput) String() string {
 // NewMemoryOutput return a output instance that it print message to buffer
 func NewMemoryOutput(_ *CfgOutput) (Output, error) {
 	r := &memoryOutput{}
-	r.baseOutput = &baseOutput{w: &r.buf}
+	r.Output = NewBaseOutput(&r.buf)
 	return r, nil
 }

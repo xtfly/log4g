@@ -5,14 +5,18 @@ import (
 )
 
 type consoleOutput struct {
-	*baseOutput
+	Output
 }
 
 // NewConsoleOutput return a output instance that it print message to stdio
-func NewConsoleOutput(_ *CfgOutput) (Output, error) {
+func NewConsoleOutput(arg *CfgOutput) (Output, error) {
 	r := &consoleOutput{}
-	r.baseOutput = &baseOutput{
-		w: os.Stdout,
+	if arg != nil && arg.Properties["async"] == "true" {
+		r.Output = NewAynscOutput(os.Stdout,
+			GetQueueSize(arg.Properties["queue_size"]), GetBatchNum(arg.Properties["batch_num"]))
+	} else {
+		r.Output = NewBaseOutput(os.Stdout)
 	}
+
 	return r, nil
 }

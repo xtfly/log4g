@@ -1,19 +1,19 @@
 package log
 
 import (
+	"io"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type rollingOutput struct {
-	*baseOutput
+	Output
 }
 
 // NewRollingOutput return a output instance that it print message to stdio
 func NewRollingOutput(arg *CfgOutput) (o Output, err error) {
 	r := &rollingOutput{}
-	r.baseOutput = &baseOutput{}
 	o = r
 
 	fpath := arg.Properties["file"]
@@ -40,18 +40,25 @@ func NewRollingOutput(arg *CfgOutput) (o Output, err error) {
 		rw.nameMode = rollingNameModePostfix
 	}
 
+	var w io.Writer
 	if arg.Name == "size_rolling_file" {
 		maxSize := getMaxSize(arg.Properties["size"])
 		rws := &rollingFileWriterSize{rw, maxSize}
 		rws.self = rws
-		r.w = rws
+		w = rws
 	} else if arg.Name == "time_rolling_file" {
 		timePattern := arg.Properties["pattern"]
 		rws := &rollingFileWriterTime{rw, timePattern, ""}
 		rws.self = rws
-		r.w = rws
+		w = rws
 	}
 
+	if arg.Properties["async"] == "true" {
+		r.Output = NewAynscOutput(w,
+			GetQueueSize(arg.Properties["queue_size"]), GetBatchNum(arg.Properties["batch_num"]))
+	} else {
+		r.Output = NewBaseOutput(w)
+	}
 	return r, nil
 }
 

@@ -86,7 +86,7 @@ var (
 //     %{level}     Log level (Level)
 //     %{module}    Module (string)
 //     %{program}   Basename of os.Args[0] (string)
-//     %{message}   Message (string)
+//     %{msg}       Message (string)
 //     %{longfile}  Full file name and line number: /a/b/c/d.go:23
 //     %{shortfile} Final file name element and line number: d.go:23
 //
@@ -196,19 +196,24 @@ func moduleFormatFunc(evt *Event, _ *part) interface{} {
 func messageFormatFunc(evt *Event, _ *part) interface{} {
 	msg := evt.Format
 	if len(evt.Arguments) != 0 {
-		msg = fmt.Sprintf(evt.Format, evt.Arguments...)
+		if len(evt.Format) != 0 {
+			msg = fmt.Sprintf(evt.Format, evt.Arguments...)
+		} else {
+			msg = fmt.Sprint(evt.Arguments...)
+		}
 	}
+
 	return msg
 }
 
 // level
 func levelFormatFunc(evt *Event, _ *part) interface{} {
-	return LevelString(evt.Level)
+	return evt.Level.String()
 }
 
 // lvl
 func lvlFormatFunc(evt *Event, _ *part) interface{} {
-	return LvlString(evt.Level)
+	return evt.Level.ShortStr()
 }
 
 type callerInfo struct {
@@ -274,7 +279,7 @@ func getCallInfo(evt *Event, needFun bool) *callerInfo {
 		evt.Ctx = context.WithValue(evt.Ctx, "__caller_info", ci)
 	}
 
-	if needFun {
+	if needFun && ci.pkg == "" {
 		if f := runtime.FuncForPC(ci.pc); f != nil {
 			fs := f.Name()
 			i := strings.LastIndex(fs, "/")

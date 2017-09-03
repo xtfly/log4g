@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-// 日志级别
+// Log level type
 type Level int
 
-// 统一日志级别定义
+// Log levels
 const (
 	Uninitialized Level = iota
 	All
@@ -21,30 +21,55 @@ const (
 	Off
 )
 
+// Writer logger writer
 type Writer interface {
-	// 打印Trace级别的日志
+	// Tracef formats message according to format specifier
+	// and writes to log with level = Trace.
 	Tracef(fmt string, args ...interface{})
-	Trace(msg string)
 
-	// 打印Debug级别的日志
+	// Trace formats message using the default formats for its operands
+	// and writes to log with level = Trace
+	Trace(msg ...interface{})
+
+	// Debugf formats message according to format specifier
+	// and writes to log with level = Debug.
 	Debugf(fmt string, args ...interface{})
-	Debug(msg string)
 
-	// 打印Info级别的日志
+	// Debug formats message using the default formats for its operands
+	// and writes to log with level = Debug
+	Debug(msg ...interface{})
+
+	// Infof formats message according to format specifier
+	// and writes to log with level = Info.
 	Infof(fmt string, args ...interface{})
-	Info(msg string)
 
-	// 打印Warn级别的日志
+	// Info formats message using the default formats for its operands
+	// and writes to log with level = Info
+	Info(msg ...interface{})
+
+	// Warnf formats message according to format specifier
+	// and writes to log with level = Warn.
 	Warnf(fmt string, args ...interface{})
-	Warn(msg string)
 
-	// 打印Error级别的日志
+	// Warn formats message using the default formats for its operands
+	// and writes to log with level = Warn
+	Warn(msg ...interface{})
+
+	// Errorf formats message according to format specifier
+	// and writes to log with level = Error.
 	Errorf(fmt string, args ...interface{})
-	Error(msg string)
 
-	// 打印Critical级别的日志
+	// Error formats message using the default formats for its operands
+	// and writes to log with level = Error
+	Error(msg ...interface{})
+
+	// Criticalf formats message according to format specifier
+	// and writes to log with level = Critical.
 	Criticalf(fmt string, args ...interface{})
-	Critical(msg string)
+
+	// Critical formats message using the default formats for its operands
+	// and writes to log with level = Critical
+	Critical(msg ...interface{})
 
 	// Printf 打印指定级别的日志
 	Printf(lvl Level, fmt string, args ...interface{})
@@ -56,7 +81,7 @@ type Field struct {
 	Value interface{}
 }
 
-// Logger 普通日志接口
+// Logger represents structs capable of logging messages
 type Logger interface {
 	// 增加日志扩展字段，可以采用链式调用，返回本身
 	// 此方法用于在调用Tracef/Debugf方法之前调用来增加一些扩展字段
@@ -83,7 +108,7 @@ type Logger interface {
 	Writer
 }
 
-// Factory 获取日志的工厂接口
+// Factory represents ...
 type Factory interface {
 	GetLogger(name string) Logger
 }
@@ -100,7 +125,7 @@ type Event struct {
 	Ctx       context.Context
 }
 
-// Formatter 对日志事件格式化输出
+// Formatter represents ...
 type Formatter interface {
 	// 格式化日志
 	Format(e *Event) []byte
@@ -111,32 +136,43 @@ type FormatterFuncCreator func(arg *CfgFormat) (Formatter, error)
 
 // Output appends contents to a Writer.
 type Output interface {
-	// Send 发送日志事件
+	// Send a event to the output
 	Send(e *Event)
 
-	// SetFormatter ...
+	// SetFormatter set a formatter to the output
 	SetFormatter(f Formatter)
+
+	// Close the output and quit the loop routine
+	Close()
 }
 
 // OutputFuncCreator ...
 type OutputFuncCreator func(arg *CfgOutput) (Output, error)
 
 type Manager interface {
+	// RegisterFormatterCreator ..
 	RegisterFormatterCreator(stype string, f FormatterFuncCreator)
 
+	// RegisterOutputCreator ..
 	RegisterOutputCreator(stype string, o OutputFuncCreator)
 
+	// GetLoggerOutputs ..
 	GetLoggerOutputs(name string) (ops []Output, lvl Level, err error)
 
+	// LoadConfig ..
 	LoadConfig(file string) error
 
+	// SetConfig ..
 	SetConfig(cfg *Config) error
+
+	// Close all output and wait all event write to outputs.
+	Close()
 }
 
 // Config ...
 type Config struct {
 	Formats []CfgFormat `yaml:"formats" json:"formats"`
-	Outputs []CfgOutput `yaml:"output" json:"output"`
+	Outputs []CfgOutput `yaml:"outputs" json:"outputs"`
 	Loggers []CfgLogger `yaml:"loggers" json:"loggers"`
 }
 

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// RootLoggerName is the name of the root logger.
+	// rootLoggerName is the name of the root logger.
 	rootLoggerName    = "root"
 	packageSeparator  = '/'
 	packageSeparator2 = '.'
@@ -67,6 +67,7 @@ func (f *factory) createLogger(name string, parent *defLogger) *defLogger {
 	return l
 }
 
+// newFactory return a instance of Factory
 func newFactory(manager Manager) Factory {
 	factory := &factory{
 		root:    newLogger(rootLoggerName),

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// File and directory permitions.
+// File and directory permission.
 const (
 	defaultFilePermissions      = 0600
 	defaultDirectoryPermissions = 0760

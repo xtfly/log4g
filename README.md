@@ -2,12 +2,12 @@ log4g is a logging framework that's interface like java log4j.
 
 --------
 
-## Introduce
+## Brief Introduce
 
-log4g是一个使用方式上参考log4j的Go语言实现，它涉及到三个概念：
+log4g是一个使用接口与log4j相似的Go语言实现，它涉及到三个概念：
 
- - formatter：日志格式化，通过`id`来标识，`name`表示格式化器的类型。
- - output: 日志输出目标，通过`id`来标识，`name`表示输出目标的类型，一个output关联一个formatter。
+ - formatter：日志格式化，通过`name`来标识，`type`表示格式化器的类型。
+ - output: 日志输出目标，通过`name`来标识，`type`表示输出目标的类型，一个output关联一个formatter。
  - logger：日志实例，通过`name`来标识，每个logger可以关联到多个output。
 
 
@@ -74,20 +74,21 @@ func main() {
 - [x] Output
   - [x] Console输出
      - [x] 同步
-     - [ ] 异步
+     - [x] 异步
   - [ ] 基于大小绕接文件输出
      - [x] 同步
-     - [ ] 异步
+     - [x] 异步
      - [ ] 备份压缩
   - [ ] 基于日期绕接文件输出
      - [x] 同步
-     - [ ] 异步
+     - [x] 异步
      - [ ] 备份压缩
   - [ ] 输出到syslog
      - [ ] 同步
      - [ ] 异步
 - [ ] 配置参数检查
+- [ ] 更好的测试覆盖
 
 ## Thanks
 
-本项目部分代码采用[seelog](https://github.com/cihub/seelog)与[go-logging](https://github.com/op/go-logging)的代码
+本项目部分代码继承了[seelog](https://github.com/cihub/seelog)与[go-logging](https://github.com/op/go-logging)的代码，在此表示感谢。

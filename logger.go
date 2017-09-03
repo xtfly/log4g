@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"log"
 	"time"
 )
 
@@ -9,7 +10,7 @@ const (
 	callerSkip = 1
 )
 
-// defLogger 默认日志
+// defLogger is default logger implements interface Logger
 type defLogger struct {
 	name       string     // 日志名称
 	level      Level      // 日志开启的级别
@@ -104,48 +105,48 @@ func (l *defWriter) Tracef(fmt string, args ...interface{}) {
 	l.Printf(Trace, fmt, args...)
 }
 
-func (l *defWriter) Trace(msg string) {
-	l.Printf(Trace, msg)
+func (l *defWriter) Trace(msg ...interface{}) {
+	l.Printf(Trace, "", msg...)
 }
 
 func (l *defWriter) Debugf(fmt string, args ...interface{}) {
 	l.Printf(Debug, fmt, args...)
 }
 
-func (l *defWriter) Debug(msg string) {
-	l.Printf(Debug, msg)
+func (l *defWriter) Debug(msg ...interface{}) {
+	l.Printf(Debug, "", msg...)
 }
 
 func (l *defWriter) Infof(fmt string, args ...interface{}) {
 	l.Printf(Info, fmt, args...)
 }
 
-func (l *defWriter) Info(msg string) {
-	l.Printf(Info, msg)
+func (l *defWriter) Info(msg ...interface{}) {
+	l.Printf(Info, "", msg...)
 }
 
 func (l *defWriter) Warnf(fmt string, args ...interface{}) {
 	l.Printf(Warn, fmt, args...)
 }
 
-func (l *defWriter) Warn(msg string) {
-	l.Printf(Warn, msg)
+func (l *defWriter) Warn(msg ...interface{}) {
+	l.Printf(Warn, "", msg...)
 }
 
 func (l *defWriter) Errorf(fmt string, args ...interface{}) {
 	l.Printf(Error, fmt, args...)
 }
 
-func (l *defWriter) Error(msg string) {
-	l.Printf(Error, msg)
+func (l *defWriter) Error(msg ...interface{}) {
+	l.Printf(Error, "", msg...)
 }
 
 func (l *defWriter) Criticalf(fmt string, args ...interface{}) {
 	l.Printf(Critical, fmt, args...)
 }
 
-func (l *defWriter) Critical(msg string) {
-	l.Printf(Critical, msg)
+func (l *defWriter) Critical(msg ...interface{}) {
+	l.Printf(Critical, "", msg...)
 }
 
 func (l *defWriter) Printf(lvl Level, fmt string, args ...interface{}) {
@@ -157,14 +158,16 @@ func (l *defWriter) write(name string, skip int, lvl Level, fmt string, args ...
 		return
 	}
 
-	if l.logger.outputs == nil || len(l.logger.outputs) == 0 {
+	if len(l.logger.outputs) == 0 {
 		if l.logger.parent != nil {
 			l.logger.parent.write(name, skip+1, lvl, fmt, args...)
 			return
+		} else {
+			log.Println("Warnning: not find outputs and parent for logger " + name)
 		}
 	}
 
-	// 生成事件
+	// create a new logging event
 	evt := &Event{
 		Time:      time.Now(),
 		Name:      name,
@@ -175,7 +178,7 @@ func (l *defWriter) write(name string, skip int, lvl Level, fmt string, args ...
 		Ctx:       l.ctx,
 	}
 
-	// 分发给后端的Output
+	// dispatch event to all outputs
 	for _, v := range l.logger.outputs {
 		v.Send(evt)
 	}

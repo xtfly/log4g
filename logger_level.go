@@ -24,14 +24,14 @@ var lvlStrings = map[Level]string{
 	Off:      "OFF",
 }
 
-// LevelString returns the text for the level.
-func LevelString(level Level) string {
-	return levelStrings[level]
+// String returns the text for the level.
+func (lvl Level) String() string {
+	return levelStrings[lvl]
 }
 
 // LvlString returns the short text for the level.
-func LvlString(level Level) string {
-	return lvlStrings[level]
+func (lvl Level) ShortStr() string {
+	return lvlStrings[lvl]
 }
 
 // LevelFrom returns level from string.
