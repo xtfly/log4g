@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../log4g/.idea/golog.iml" filepath="$PROJECT_DIR$/../log4g/.idea/golog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/log4g.iml" filepath="$PROJECT_DIR$/.idea/log4g.iml" />
     </modules>
   </component>
 </project>
