@@ -14,8 +14,8 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../log4g/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="62" />
+            <state relative-caret-position="501">
+              <caret line="87" column="5" lean-forward="false" selection-start-line="87" selection-start-column="5" selection-end-line="87" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -104,8 +104,8 @@
         <option value="$PROJECT_DIR$/../log4g/output_rollingwriter.go" />
         <option value="$PROJECT_DIR$/../log4g/output_rolling.go" />
         <option value="$PROJECT_DIR$/../log4g/output_rollingwriter_test.go" />
-        <option value="$PROJECT_DIR$/../log4g/README.md" />
         <option value="$PROJECT_DIR$/../log4g/.gitingore" />
+        <option value="$PROJECT_DIR$/../log4g/README.md" />
       </list>
     </option>
   </component>
@@ -733,8 +733,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../log4g/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="62" />
+        <state relative-caret-position="501">
+          <caret line="87" column="5" lean-forward="false" selection-start-line="87" selection-start-column="5" selection-end-line="87" selection-end-column="5" />
           <folding />
         </state>
       </provider>
