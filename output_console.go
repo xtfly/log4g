@@ -16,7 +16,7 @@ type consoleOutput struct {
 func NewConsoleOutput(cfg CfgOutput) (Output, error) {
 	r := &consoleOutput{}
 	if cfg != nil && cfg["async"] == "true" {
-		r.Output = NewAsynscOutput(os.Stdout,
+		r.Output = NewAsyncOutput(os.Stdout,
 			GetQueueSize(cfg["queue_size"]), GetBatchNum(cfg["batch_num"]))
 	} else {
 		r.Output = NewBaseOutput(os.Stdout)

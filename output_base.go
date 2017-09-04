@@ -78,8 +78,8 @@ func GetBatchNum(str string) int {
 	return mr
 }
 
-// NewAsynscOutput ...
-func NewAsynscOutput(w io.Writer, queueSize int, batchNum int) Output {
+// NewAsyncOutput ...
+func NewAsyncOutput(w io.Writer, queueSize int, batchNum int) Output {
 	o := &asyncOutput{
 		evtChan:  make(chan *Event, queueSize),
 		batchNum: batchNum,
