@@ -18,12 +18,12 @@ func init() {
 			{Name: "test2", Level: "debug", OutputNames: []string{"m2"}},
 		},
 		Formats: []CfgFormat{
-			{Type: "format", Name: "f1", Properties: map[string]string{"layout": "%{module}|%{lvl}>>%{msg}"}},
-			{Type: "format", Name: "f2", Properties: map[string]string{"layout": "%{f1:-5s}|%{f2:-5s}|%{module}|%{lvl:5s}>>%{msg}"}},
+			{"type": "text", "name": "f1", "layout": "%{module}|%{lvl}>>%{msg}"},
+			{"type": "text", "name": "f2", "layout": "%{f1:-5s}|%{f2:-5s}|%{module}|%{lvl:5s}>>%{msg}"},
 		},
 		Outputs: []CfgOutput{
-			{Type: "memory", Name: "m1", FormatName: "f1"},
-			{Type: "memory", Name: "m2", FormatName: "f2"},
+			{"type": "memory", "name": "m1", "format": "f1"},
+			{"type": "memory", "name": "m2", "format": "f2"},
 		},
 	}
 
@@ -92,7 +92,6 @@ func TestLoggerFields(t *testing.T) {
 	mo := getOutput("m2")
 	assert.Equal(t, mo.String(), "v1   |v2   |test2|  DBG>>xxxx")
 }
-
 
 func TestLoggerParent(t *testing.T) {
 	log := GetLogger("test")

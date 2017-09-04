@@ -12,28 +12,29 @@ var (
 )
 
 func init() {
-	GetManager().RegisterFormatterCreator("format", NewDefaultFormatter)
+	GetManager().RegisterFormatterCreator(typeText, NewTextFormatter)
 
-	GetManager().RegisterOutputCreator("console", NewConsoleOutput)
-	GetManager().RegisterOutputCreator("memory", NewMemoryOutput)
-	GetManager().RegisterOutputCreator("size_rolling_file", NewRollingOutput)
-	GetManager().RegisterOutputCreator("time_rolling_file", NewRollingOutput)
+	GetManager().RegisterOutputCreator(typeConsole, NewConsoleOutput)
+	GetManager().RegisterOutputCreator(typeMemory, NewMemoryOutput)
+	GetManager().RegisterOutputCreator(typeRollingSize, NewRollingOutput)
+	GetManager().RegisterOutputCreator(typeRollingTime, NewRollingOutput)
 
 	listenSig := make(chan os.Signal, 1)
 	signal.Notify(listenSig, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		for range listenSig {
-			GetManager().Close()
-		}
+		<-listenSig
+		GetManager().Close()
 	}()
 }
 
-// GetLogger 获取普通的日志接口
+// GetLogger return the instance that implements Logger interface specified by name,
+// name like a/b/c or a.b.c ,
+// Logger named 'a/b' is the parent of Logger named 'a/b/c'
 func GetLogger(name string) Logger {
 	return gfactory.GetLogger(name)
 }
 
-// GetManager 获取普通的日志接口
+// GetManager return the instance that implements Manager interface
 func GetManager() Manager {
 	return gmanager
 }

@@ -8,6 +8,8 @@ import (
 
 	"encoding/json"
 
+	"path"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -58,63 +60,63 @@ func (m *defManager) GetLoggerOutputs(name string) (ops []Output, lvl Level, err
 			return nil, lvl, fmt.Errorf("Not find output.name[%s] config", opid)
 		}
 
-		fmtcfg := m.config.GetCfgFormat(opcfg.FormatName)
+		fmtcfg := m.config.GetCfgFormat(opcfg.FormatName())
 		if fmtcfg == nil {
-			return nil, lvl, fmt.Errorf("Not find format.name[%s] config", opcfg.FormatName)
+			return nil, lvl, fmt.Errorf("Not find format.name[%s] config", opcfg.FormatName())
 		}
 
-		fmtcreator, ok := m.formatterCreators[fmtcfg.Type]
+		fmtcreator, ok := m.formatterCreators[fmtcfg.Type()]
 		if !ok {
-			return nil, lvl, fmt.Errorf("Not find registered format.type[%s] creator", fmtcfg.Type)
+			return nil, lvl, fmt.Errorf("Not find registered format.type[%s] creator", fmtcfg.Type())
 		}
 
-		fmtt, ok := m.formats[fmtcfg.Name]
+		fmtt, ok := m.formats[fmtcfg.Name()]
 		if !ok {
 			if fmtt, err = fmtcreator(fmtcfg); err != nil {
 				return
 			}
-			m.formats[fmtcfg.Name] = fmtt
+			m.formats[fmtcfg.Name()] = fmtt
 		}
 
-		opcreator, ok := m.outputCreators[opcfg.Type]
+		opcreator, ok := m.outputCreators[opcfg.Type()]
 		if !ok {
-			return nil, Uninitialized, fmt.Errorf("Not find registered output.type[%s] creator", opcfg.Type)
+			return nil, Uninitialized, fmt.Errorf("Not find registered output.type[%s] creator", opcfg.Type())
 		}
 
-		op, ok := m.outputs[opcfg.Name]
+		op, ok := m.outputs[opcfg.Name()]
 		if !ok {
 			if op, err = opcreator(opcfg); err != nil {
 				return
 			}
 			op.SetFormatter(fmtt)
-			m.outputs[opcfg.Name] = op
+			m.outputs[opcfg.Name()] = op
 		}
 		ops = append(ops, op)
 	}
 	return
 }
 
-func (m *defManager) LoadConfig(file string) error {
-	m.Lock()
-	defer m.Unlock()
+func (m *defManager) LoadConfigFile(file string) error {
 	bs, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
+	ext := path.Ext(file)
+	return m.LoadConfig(bs, ext)
+}
 
-	if strings.HasSuffix(file, ".yaml") || strings.HasSuffix(file, ".yml") {
+func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {
+	ext = strings.ToLower(ext)
+	err = fmt.Errorf("not support config file type %s", ext)
+	m.Lock()
+	defer m.Unlock()
+
+	if ext == "yaml" || ext == "yml" {
 		err = yaml.Unmarshal(bs, m.config)
-	}
-
-	if strings.HasSuffix(file, ".json") {
+	} else if ext == "json" {
 		err = json.Unmarshal(bs, m.config)
 	}
-
-	if err != nil {
-		return err
-	}
-
-	return fmt.Errorf("not support config file type %s", file[strings.LastIndex(file, "."):])
+	return err
 }
 
 func (m *defManager) SetConfig(cfg *Config) error {

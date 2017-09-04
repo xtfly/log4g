@@ -8,8 +8,8 @@ import (
 const (
 	// rootLoggerName is the name of the root logger.
 	rootLoggerName    = "root"
-	packageSeparator  = '/'
-	packageSeparator2 = '.'
+	packageSepBySlash = '/'
+	packageSepByDot   = '.'
 )
 
 // factory implements Factory interface.
@@ -21,11 +21,13 @@ type factory struct {
 }
 
 func (f *factory) GetLogger(name string) Logger {
-	if name == "" {
-		return f.root
+	f.Lock()
+	defer f.Unlock()
+
+	if name == "" || name == rootLoggerName {
+		return f.getRootLogger()
 	}
 
-	f.Lock()
 	l, ok := f.loggers[name]
 	if !ok {
 		l = f.createLogger(name, f.getParent(name))
@@ -36,17 +38,16 @@ func (f *factory) GetLogger(name string) Logger {
 			l.SetOutputs(ops)
 		}
 	}
-	f.Unlock()
 
 	return l
 }
 
 // getParent returns parent logger for given logger.
 func (f *factory) getParent(name string) *defLogger {
-	parent := f.root
+	parent := f.getRootLogger()
 	for i, c := range name {
 		// Search for package separator character
-		if c == packageSeparator || c == packageSeparator2 {
+		if c == packageSepBySlash || c == packageSepByDot {
 			parentName := name[0:i]
 			if parentName != "" {
 				parent = f.createLogger(parentName, parent)
@@ -67,23 +68,31 @@ func (f *factory) createLogger(name string, parent *defLogger) *defLogger {
 	return l
 }
 
+func (f *factory) getRootLogger() *defLogger {
+	if f.root != nil {
+		return f.root
+	}
+
+	f.root = newLogger(rootLoggerName)
+	if ops, lvl, err := f.manager.GetLoggerOutputs(rootLoggerName); err != nil {
+		f.root.SetLevel(Debug)
+		console, _ := NewConsoleOutput(nil)
+		f.root.SetOutputs([]Output{console})
+	} else {
+		f.root.SetLevel(lvl)
+		f.root.SetOutputs(ops)
+	}
+
+	f.loggers[rootLoggerName] = f.root
+	return f.root
+}
+
 // newFactory return a instance of Factory
 func newFactory(manager Manager) Factory {
 	factory := &factory{
-		root:    newLogger(rootLoggerName),
 		loggers: make(map[string]*defLogger),
 		manager: manager,
 	}
 
-	if ops, lvl, err := factory.manager.GetLoggerOutputs(rootLoggerName); err != nil {
-		factory.root.SetLevel(Debug)
-		console, _ := NewConsoleOutput(nil)
-		factory.root.SetOutputs([]Output{console})
-	} else {
-		factory.root.SetLevel(lvl)
-		factory.root.SetOutputs(ops)
-	}
-
-	factory.loggers[rootLoggerName] = factory.root
 	return factory
 }

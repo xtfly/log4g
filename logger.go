@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	callerSkip = 1
+	callerSkip = 3
 )
 
 // defLogger is default logger implements interface Logger
@@ -15,7 +15,7 @@ type defLogger struct {
 	name       string     // 日志名称
 	level      Level      // 日志开启的级别
 	parent     *defLogger // 日志的父一级
-	outputs    []Output   // 日志的Appender列表
+	outputs    []Output   // 日志的Output列表
 	callerSkip int        // caller skip depth
 
 	*defWriter

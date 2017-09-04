@@ -1,4 +1,4 @@
-/.log4g_tmp
-/.DS_Store
-/.idea
-/vendor
+.log4g_tmp
+.DS_Store
+.idea
+vendor

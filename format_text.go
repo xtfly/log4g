@@ -2,18 +2,22 @@ package log
 
 import "bytes"
 
-type defFormatter struct {
+const (
+	typeText = "text"
+)
+
+type textFormatter struct {
 	layout       string
 	strFormatter *StringFormatter
 }
 
-// NewDefaultFormatter return a Formatter instance using layout formatter string
-func NewDefaultFormatter(arg *CfgFormat) (df Formatter, err error) {
-	if arg == nil {
+// NewTextFormatter return a Formatter instance using layout formatter string
+func NewTextFormatter(cfg CfgFormat) (df Formatter, err error) {
+	if cfg == nil {
 		panic("not set format config argument.")
 	}
-	obj := &defFormatter{
-		layout:       arg.Properties["layout"],
+	obj := &textFormatter{
+		layout:       cfg["layout"],
 		strFormatter: &StringFormatter{},
 	}
 	err = obj.strFormatter.Parser(obj.layout)
@@ -22,7 +26,7 @@ func NewDefaultFormatter(arg *CfgFormat) (df Formatter, err error) {
 }
 
 // Format ...
-func (f *defFormatter) Format(e *Event) []byte {
+func (f *textFormatter) Format(e *Event) []byte {
 	var buf bytes.Buffer
 	f.strFormatter.Format(e, &buf)
 	return buf.Bytes()

@@ -55,8 +55,8 @@ Format:
 ```
 formats:
   - name: f1     # format的名称，用于output引用
-    type: format # 当前只能为format
-    layout: %{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n
+    type: text # 当前只能为text
+    layout: "%{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
 ```
 
 Output:

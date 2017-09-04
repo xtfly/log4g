@@ -7,33 +7,38 @@ import (
 	"strings"
 )
 
+const (
+	typeRollingSize = "size_rolling_file"
+	typeRollingTime = "time_rolling_file"
+)
+
 type rollingOutput struct {
 	Output
 }
 
 // NewRollingOutput return a output instance that it print message to stdio
-func NewRollingOutput(arg *CfgOutput) (o Output, err error) {
+func NewRollingOutput(cfg CfgOutput) (o Output, err error) {
 	r := &rollingOutput{}
 	o = r
 
-	fpath := arg.Properties["file"]
+	fpath := cfg["file"]
 	rw := newRollingFileWriter(fpath, "")
 
 	rw.archiveType = rollingArchiveNone
-	switch arg.Properties["archive"] {
+	switch cfg["archive"] {
 	case "zip":
 		rw.archiveType = rollingArchiveZip
 	case "gzip":
 		rw.archiveType = rollingArchiveGzip
 	}
 
-	rw.maxRolls = getMaxRolls(arg.Properties["backups"])
-	rw.dirPerm = getFileMode(arg.Properties["dir_perm"], defaultDirectoryPermissions)
-	rw.filePerm = getFileMode(arg.Properties["file_perm"], defaultFilePermissions)
-	rw.backPerm = getFileMode(arg.Properties["back_perm"], defaultBackupPermissions)
+	rw.maxRolls = getMaxRolls(cfg["backups"])
+	rw.dirPerm = getFileMode(cfg["dir_perm"], defaultDirectoryPermissions)
+	rw.filePerm = getFileMode(cfg["file_perm"], defaultFilePermissions)
+	rw.backPerm = getFileMode(cfg["back_perm"], defaultBackupPermissions)
 
 	rw.nameMode = rollingNameModePostfix
-	switch arg.Properties["name_mode"] {
+	switch cfg["name_mode"] {
 	case "prefix":
 		rw.nameMode = rollingNameModePrefix
 	case "postfix":
@@ -41,21 +46,21 @@ func NewRollingOutput(arg *CfgOutput) (o Output, err error) {
 	}
 
 	var w io.Writer
-	if arg.Name == "size_rolling_file" {
-		maxSize := getMaxSize(arg.Properties["size"])
+	if cfg.Name() == typeRollingSize {
+		maxSize := getMaxSize(cfg["size"])
 		rws := &rollingFileWriterSize{rw, maxSize}
 		rws.self = rws
 		w = rws
-	} else if arg.Name == "time_rolling_file" {
-		timePattern := arg.Properties["pattern"]
+	} else if cfg.Name() == typeRollingTime {
+		timePattern := cfg["pattern"]
 		rws := &rollingFileWriterTime{rw, timePattern, ""}
 		rws.self = rws
 		w = rws
 	}
 
-	if arg.Properties["async"] == "true" {
+	if cfg["async"] == "true" {
 		r.Output = NewAynscOutput(w,
-			GetQueueSize(arg.Properties["queue_size"]), GetBatchNum(arg.Properties["batch_num"]))
+			GetQueueSize(cfg["queue_size"]), GetBatchNum(cfg["batch_num"]))
 	} else {
 		r.Output = NewBaseOutput(w)
 	}
