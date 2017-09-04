@@ -59,7 +59,7 @@ func NewRollingOutput(cfg CfgOutput) (o Output, err error) {
 	}
 
 	if cfg["async"] == "true" {
-		r.Output = NewAynscOutput(w,
+		r.Output = NewAsynscOutput(w,
 			GetQueueSize(cfg["queue_size"]), GetBatchNum(cfg["batch_num"]))
 	} else {
 		r.Output = NewBaseOutput(w)
