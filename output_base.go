@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -34,18 +35,11 @@ func (o *baseOutput) Send(e *Event) {
 		return
 	}
 
-	var msg string
-	if len(e.Arguments) == 0 {
-		msg = e.Format
-	} else {
-		msg = fmt.Sprintf(e.Format, e.Arguments...)
-	}
-
 	fmt.Fprintf(o.w, defaultLayout,
 		e.Level.String(),
 		e.Time.Format(defaultTimeLayout),
 		e.Name,
-		msg)
+		e.Message())
 }
 
 // SetFormatter ...
@@ -79,7 +73,7 @@ func GetBatchNum(str string) int {
 		mr = 100
 	}
 	if mr > 500 {
-		mr = 100
+		mr = 500
 	}
 	return mr
 }
@@ -101,15 +95,25 @@ type asyncOutput struct {
 	currNum  int
 	buf      bytes.Buffer
 	wait     sync.WaitGroup
+	closed   int32
 }
 
 func (o *asyncOutput) Send(e *Event) {
+	if atomic.LoadInt32(&o.closed) == 1 {
+		return
+	}
 	o.evtChan <- e
 }
 
 func (o *asyncOutput) Close() {
+	// support duplicate call Close method
+	if atomic.LoadInt32(&o.closed) == 1 {
+		return
+	}
 	o.evtChan <- nil
 	o.wait.Wait()
+	atomic.StoreInt32(&o.closed, 1)
+	close(o.evtChan)
 }
 
 func (o *asyncOutput) flush() {
@@ -121,16 +125,21 @@ func (o *asyncOutput) flush() {
 
 func (o *asyncOutput) loop() {
 	o.wait.Add(1)
-	tick := time.NewTicker(2 * time.Second)
+	defer o.wait.Done()
+
+	tick := time.NewTicker(5 * time.Second)
 	defer tick.Stop()
+
 	for {
 		select {
 		case <-tick.C:
 			o.flush()
 		case evt := <-o.evtChan:
 			if evt == nil {
-				break
+				o.flush()
+				return
 			}
+
 			o.buf.Write(o.f.Format(evt))
 			o.currNum++
 			if o.currNum >= o.batchNum {
@@ -138,5 +147,4 @@ func (o *asyncOutput) loop() {
 			}
 		}
 	}
-	o.wait.Done()
 }

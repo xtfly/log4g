@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -128,6 +129,19 @@ type Event struct {
 	Time      time.Time
 	CallDepth int
 	Ctx       context.Context
+}
+
+// Message return a string which format by param 'Format' and 'Arguments'
+func (e *Event) Message() string {
+	msg := e.Format
+	if len(e.Arguments) != 0 {
+		if len(e.Format) != 0 {
+			msg = fmt.Sprintf(e.Format, e.Arguments...)
+		} else {
+			msg = fmt.Sprint(e.Arguments...)
+		}
+	}
+	return msg
 }
 
 // -----------------------------

@@ -194,16 +194,7 @@ func moduleFormatFunc(evt *Event, _ *part) interface{} {
 
 // message
 func messageFormatFunc(evt *Event, _ *part) interface{} {
-	msg := evt.Format
-	if len(evt.Arguments) != 0 {
-		if len(evt.Format) != 0 {
-			msg = fmt.Sprintf(evt.Format, evt.Arguments...)
-		} else {
-			msg = fmt.Sprint(evt.Arguments...)
-		}
-	}
-
-	return msg
+	return evt.Message()
 }
 
 // level
