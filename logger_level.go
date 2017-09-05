@@ -41,5 +41,5 @@ func LevelFrom(str string) Level {
 			return k
 		}
 	}
-	return Info
+	return Uninitialized
 }

@@ -16,10 +16,10 @@ type consoleOutput struct {
 func NewConsoleOutput(cfg CfgOutput) (Output, error) {
 	r := &consoleOutput{}
 	if cfg != nil && cfg["async"] == "true" {
-		r.Output = NewAsyncOutput(os.Stdout,
+		r.Output = NewAsyncOutput(os.Stdout, GetThresholdLvl(cfg["threshold"]),
 			GetQueueSize(cfg["queue_size"]), GetBatchNum(cfg["batch_num"]))
 	} else {
-		r.Output = NewBaseOutput(os.Stdout)
+		r.Output = NewBaseOutput(os.Stdout, GetThresholdLvl(cfg["threshold"]))
 	}
 
 	return r, nil

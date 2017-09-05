@@ -31,3 +31,14 @@ func (f *textFormatter) Format(e *Event) []byte {
 	f.strFormatter.Format(e, &buf)
 	return buf.Bytes()
 }
+
+// CallerInfoFlag ...
+func (f *textFormatter) CallerInfoFlag() int {
+	ret := 0
+	for _, v := range f.strFormatter.parts {
+		if r, ok := formatCallerFlags[v.verbName]; ok && r > ret {
+			ret = r
+		}
+	}
+	return ret
+}

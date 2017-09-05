@@ -12,19 +12,21 @@ const (
 
 // defLogger is default logger implements interface Logger
 type defLogger struct {
-	name       string     // 日志名称
-	level      Level      // 日志开启的级别
-	parent     *defLogger // 日志的父一级
-	outputs    []Output   // 日志的Output列表
-	callerSkip int        // caller skip depth
+	name           string     // 日志名称
+	level          Level      // 日志开启的级别
+	parent         *defLogger // 日志的父一级
+	outputs        []Output   // 日志的Output列表
+	callerSkip     int        // caller skip depth
+	callerInfoFlag int        //
 
 	*defWriter
 }
 
 func newLogger(name string) *defLogger {
 	l := &defLogger{
-		name:  name,
-		level: Uninitialized,
+		name:       name,
+		level:      Uninitialized,
+		callerSkip: callerSkip,
 	}
 	w := &defWriter{logger: l, ctx: context.Background()}
 	l.defWriter = w
@@ -94,6 +96,11 @@ func (l *defLogger) SetCallerSkip(skip int) {
 
 func (l *defLogger) SetOutputs(outputs []Output) {
 	l.outputs = outputs
+	for _, op := range outputs {
+		if l.callerInfoFlag < op.CallerInfoFlag() {
+			l.callerInfoFlag = op.CallerInfoFlag()
+		}
+	}
 }
 
 type defWriter struct {
@@ -176,6 +183,12 @@ func (l *defWriter) write(name string, skip int, lvl Level, fmt string, args ...
 		Arguments: args,
 		CallDepth: skip,
 		Ctx:       l.ctx,
+	}
+
+	if l.logger.callerInfoFlag == ciFuncFlag {
+		getCallInfo(evt, true)
+	} else if l.logger.callerInfoFlag == ciFileFlag {
+		getCallInfo(evt, false)
 	}
 
 	// dispatch event to all outputs

@@ -76,7 +76,7 @@ type Writer interface {
 	// and writes to log with level = Critical
 	Critical(msg ...interface{})
 
-	// Printf 打印指定级别的日志
+	// Printf message to logger using specified level
 	Printf(lvl Level, fmt string, args ...interface{})
 }
 
@@ -150,8 +150,13 @@ func (e *Event) Message() string {
 
 // Formatter represents ...
 type Formatter interface {
-	// 格式化日志
+	// Format logging event to bytes
 	Format(e *Event) []byte
+
+	// CallerInfoFlag ...
+	// 1: line, file
+	// 2: func and above 1
+	CallerInfoFlag() int
 }
 
 // FormatterFuncCreator ...
@@ -168,6 +173,9 @@ type Output interface {
 
 	// SetFormatter set a formatter to the output
 	SetFormatter(f Formatter)
+
+	// CallerInfoFlag ...
+	CallerInfoFlag() int
 
 	// Close the output and quit the loop routine
 	Close()
@@ -254,10 +262,12 @@ type CfgLogger struct {
 // CfgOutput ...
 type CfgOutput map[string]string
 
+// Name return the name of Output
 func (c CfgOutput) Name() string {
 	return c["name"]
 }
 
+// Type return the type of Output
 func (c CfgOutput) Type() string {
 	return c["type"]
 }
@@ -269,10 +279,12 @@ func (c CfgOutput) FormatName() string {
 // CfgOutput ...
 type CfgFormat map[string]string
 
+// Name return the name of Format
 func (c CfgFormat) Name() string {
 	return c["name"]
 }
 
+// Type return the type of Format
 func (c CfgFormat) Type() string {
 	return c["type"]
 }

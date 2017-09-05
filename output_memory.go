@@ -20,6 +20,6 @@ func (o *memoryOutput) String() string {
 // NewMemoryOutput return a output instance that it print message to buffer
 func NewMemoryOutput(_ CfgOutput) (Output, error) {
 	r := &memoryOutput{}
-	r.Output = NewBaseOutput(&r.buf)
+	r.Output = NewBaseOutput(&r.buf, All)
 	return r, nil
 }

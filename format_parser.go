@@ -6,7 +6,6 @@
 package log
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -14,7 +13,6 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strings"
 )
 
@@ -72,6 +70,16 @@ var (
 		"shortfunc": shortfuncFormatFunc,
 		verbTime:    timeFormatFunc,
 		verbExtend:  extendFormatFunc,
+	}
+
+	formatCallerFlags = map[string]int{
+		"line":      ciFileFlag,
+		"longfile":  ciFileFlag,
+		"shortfile": ciFileFlag,
+		"longpkg":   ciFuncFlag,
+		"shortpkg":  ciFuncFlag,
+		"longfunc":  ciFuncFlag,
+		"shortfunc": ciFuncFlag,
 	}
 )
 
@@ -207,14 +215,6 @@ func lvlFormatFunc(evt *Event, _ *part) interface{} {
 	return evt.Level.ShortStr()
 }
 
-type callerInfo struct {
-	file string
-	line int
-	pkg  string
-	fun  string
-	pc   uintptr
-}
-
 // %{line}  line number: 30
 func lineFormatFunc(evt *Event, _ *part) interface{} {
 	ci := getCallInfo(evt, false)
@@ -256,34 +256,6 @@ func shortfuncFormatFunc(evt *Event, _ *part) interface{} {
 	ci := getCallInfo(evt, true)
 	i := strings.LastIndex(ci.fun, ".")
 	return ci.fun[i+1:]
-}
-
-func getCallInfo(evt *Event, needFun bool) *callerInfo {
-	ci := evt.Ctx.Value("__caller_info").(*callerInfo)
-	if ci == nil {
-		ci = &callerInfo{}
-		var ok bool
-		ci.pc, ci.file, ci.line, ok = runtime.Caller(evt.CallDepth)
-		if !ok {
-			ci.file, ci.line = "???", 0
-		}
-		evt.Ctx = context.WithValue(evt.Ctx, "__caller_info", ci)
-	}
-
-	if needFun && ci.pkg == "" {
-		if f := runtime.FuncForPC(ci.pc); f != nil {
-			fs := f.Name()
-			i := strings.LastIndex(fs, "/")
-			j := strings.Index(fs[i+1:], ".")
-			if j < 1 {
-				ci.pkg, ci.fun = "???", "???"
-			} else {
-				ci.pkg, ci.fun = fs[:i+j+1], fs[i+j+2:]
-			}
-		}
-	}
-
-	return ci
 }
 
 // %{time} Time when log occurred (time.Time)
