@@ -1,10 +1,10 @@
-log4g is a logging framework that's interface like java log4j.
+log4g is a logging framework that's interface like java log4j. it's designed for configurable and pluggable logging.
 
 --------
 
 ## Brief Introduce
 
-log4g是一个使用接口与log4j相似的Go语言实现，它涉及到三个概念：
+log4g是一个使用接口与log4j相似的Go语言实现，专为可配置和可扩展而设计的日志框架，它涉及到三个概念：
 
  - formatter：日志格式化，通过`name`来标识，`type`表示格式化器的类型。
  - output: 日志输出目标，通过`name`来标识，`type`表示输出目标的类型，一个output关联一个formatter。
@@ -96,6 +96,10 @@ outputs:
     #queue_size: 100
     #batch_num: 10
     #threshold: info
+  - name: s1
+    type: syslog
+    format: f1
+    prefix: module
 ```
 
 
@@ -106,7 +110,7 @@ import "github.com/xtfly/log4g"
 
 func main() {
 
-	_ := log.GetManager().LoadConfig("log4g.yml")
+	_ := log.GetManager().LoadConfigFile("log4g.yml")
 
 	dlog := log.GetLogger("name")
 	dlog.Debug("message")
@@ -119,11 +123,11 @@ func main() {
  - extend Formatter
  - extend Output
 
-## TODO
+## Task List
 
 - [x] 日志框架
 - [x] Formatter
-  - [x] 默认按%{verb}解析layout
+  - [x] Text: 按%{verb}解析layout
 - [x] Output
   - [x] Console输出
      - [x] 同步
@@ -131,14 +135,13 @@ func main() {
   - [ ] 基于大小绕接文件输出
      - [x] 同步
      - [x] 异步
-     - [ ] 备份压缩
+     - [ ] 备份压缩（未验证）
   - [ ] 基于日期绕接文件输出
      - [x] 同步
      - [x] 异步
-     - [ ] 备份压缩
-  - [ ] 输出到syslog
-     - [ ] 同步
-     - [ ] 异步
+     - [ ] 备份压缩（未验证）
+  - [x] 输出到syslog
+     - [x] 同步
 - [ ] 配置参数检查
 - [ ] 更多的测试覆盖
 

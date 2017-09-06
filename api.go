@@ -153,7 +153,8 @@ type Formatter interface {
 	// Format logging event to bytes
 	Format(e *Event) []byte
 
-	// CallerInfoFlag ...
+	// CallerInfoFlag return caller info flag:
+	// 0: none
 	// 1: line, file
 	// 2: func and above 1
 	CallerInfoFlag() int

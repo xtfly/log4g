@@ -18,6 +18,7 @@ func init() {
 	GetManager().RegisterOutputCreator(typeMemory, NewMemoryOutput)
 	GetManager().RegisterOutputCreator(typeRollingSize, NewRollingOutput)
 	GetManager().RegisterOutputCreator(typeRollingTime, NewRollingOutput)
+	GetManager().RegisterOutputCreator(typeSyslog, NewSyslogOutput)
 
 	listenSig := make(chan os.Signal, 1)
 	signal.Notify(listenSig, os.Interrupt, syscall.SIGTERM)

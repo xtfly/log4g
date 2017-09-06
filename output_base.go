@@ -62,7 +62,7 @@ func (o *baseOutput) CallerInfoFlag() int {
 	if o.f != nil {
 		return o.f.CallerInfoFlag()
 	}
-	return 0
+	return ciNoneFlog
 }
 
 // Close ...

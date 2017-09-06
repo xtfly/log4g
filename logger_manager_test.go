@@ -39,13 +39,17 @@ outputs:
     pattern: 2006-01-02
     backups: 5
     threshold: info
+  - name: s1
+    type: syslog
+    format: f1
+    prefix: module
 loggers:
   - name: root
     level: info
     outputs: ["r1", "c1"]
   - name: a/b
     level: error
-    outputs: ["r1", "r2"]
+    outputs: ["r2", "s1"]
 `
 )
 
@@ -56,6 +60,7 @@ func TestManager(t *testing.T) {
 	m.RegisterOutputCreator(typeMemory, NewMemoryOutput)
 	m.RegisterOutputCreator(typeRollingSize, NewRollingOutput)
 	m.RegisterOutputCreator(typeRollingTime, NewRollingOutput)
+	m.RegisterOutputCreator(typeSyslog, NewSyslogOutput)
 
 	err := m.LoadConfig([]byte(test_cfg), "yaml")
 	fmt.Printf("%v\n", err)

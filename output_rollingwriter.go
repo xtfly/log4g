@@ -64,7 +64,7 @@ const (
 	rollingNameModePrefix
 )
 
-// Old logs archivation type.
+// Old logs archive type.
 type rollingArchiveType uint8
 
 const (
@@ -156,9 +156,14 @@ func (compressionType *compressionType) rollingArchiveTypeName(name string, expl
 // rollerVirtual is an interface that represents all virtual funcs that are
 // called in different rolling writer subtypes.
 type rollerVirtual interface {
-	needsToRoll() bool                                  // Returns true if needs to switch to another file.
-	isFileRollNameValid(rname string) bool              // Returns true if logger roll file name (postfix/prefix/etc.) is ok.
-	sortFileRollNamesAsc(fs []string) ([]string, error) // Sorts logger roll file names in ascending order of their creation by logger.
+	// Returns true if needs to switch to another file.
+	needsToRoll() bool
+
+	// Returns true if logger roll file name (postfix/prefix/etc.) is ok.
+	isFileRollNameValid(rname string) bool
+
+	// Sorts logger roll file names in ascending order of their creation by logger.
+	sortFileRollNamesAsc(fs []string) ([]string, error)
 
 	// getNewHistoryRollFileName is called whenever we are about to roll the
 	// current log file. It returns the name the current log file should be
@@ -421,7 +426,6 @@ func (rw *rollingFileWriter) deleteOldRolls(history []string) error {
 			}
 		} else {
 			os.MkdirAll(filepath.Dir(rw.archivePath), rw.dirPerm)
-
 			rw.archiveUnexplodedLogs(compressionTypes[rw.archiveType], rollsToDelete, history)
 		}
 	}

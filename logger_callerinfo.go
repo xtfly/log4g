@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	ciFileFlag = 1
-	ciFuncFlag = 2
+	ciNoneFlog = iota
+	ciFileFlag
+	ciFuncFlag
 )
 
 type callerInfo struct {

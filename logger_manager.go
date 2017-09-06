@@ -111,20 +111,25 @@ func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {
 	m.Lock()
 	defer m.Unlock()
 
+	cfg := &Config{}
 	if ext == "yaml" || ext == "yml" {
-		err = yaml.Unmarshal(bs, m.config)
+		err = yaml.Unmarshal(bs, cfg)
 	} else if ext == "json" {
-		err = json.Unmarshal(bs, m.config)
+		err = json.Unmarshal(bs, cfg)
 	}
-	return err
+	return m.setConfig(cfg)
+}
+
+func (m *defManager) setConfig(cfg *Config) error {
+	// TODO check the output & format relationship in config
+	m.config = cfg
+	return nil
 }
 
 func (m *defManager) SetConfig(cfg *Config) error {
 	m.Lock()
-	// TODO check the output & format relationship in config
-	m.config = cfg
-	m.Unlock()
-	return nil
+	defer m.Unlock()
+	return m.setConfig(cfg)
 }
 
 func (m *defManager) Close() {
