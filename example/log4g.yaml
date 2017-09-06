@@ -1,7 +1,7 @@
 formats:
   - name: f1
     type: text
-    layout: "%{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
+    layout: "%{time} %{level} %{module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
 outputs:
   - name: c1
     type: console
@@ -13,10 +13,14 @@ outputs:
     file: log/rf.log
     file_perm: 0640
     back_perm: 0550
-    dir_perm: 0650
+    dir_perm: 0750
     size: 1M
     backups: 5
     threshold: info
+  - name: s1
+    type: syslog
+    format: f1
+    prefix: module
 loggers:
   - name: root
     level: info
