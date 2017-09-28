@@ -102,7 +102,7 @@ func (m *defManager) LoadConfigFile(file string) error {
 		return err
 	}
 	ext := path.Ext(file)
-	return m.LoadConfig(bs, ext)
+	return m.LoadConfig(bs, ext[1:])
 }
 
 func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {

@@ -46,16 +46,19 @@ func NewRollingOutput(cfg CfgOutput) (o Output, err error) {
 	}
 
 	var w io.Writer
-	if cfg.Name() == typeRollingSize {
+	switch cfg.Type() {
+	case typeRollingSize:
 		maxSize := getMaxSize(cfg["size"])
 		rws := &rollingFileWriterSize{rw, maxSize}
 		rws.self = rws
 		w = rws
-	} else if cfg.Name() == typeRollingTime {
+	case typeRollingTime:
 		timePattern := cfg["pattern"]
 		rws := &rollingFileWriterTime{rw, timePattern, ""}
 		rws.self = rws
 		w = rws
+	default:
+		panic("not support type " + cfg.Type())
 	}
 
 	if cfg["async"] == "true" {

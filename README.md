@@ -56,7 +56,7 @@ Format:
 formats:
   - name: f1     # format的名称，用于output引用
     type: text # 当前只能为text
-    layout: "%{time} %{level} ${module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
+    layout: "%{time} %{level} %{module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
 ```
 
 Output:
@@ -76,7 +76,7 @@ outputs:
     file: log/rf.log   # 正在写的文件
     file_perm: 0640    # 正在写的文件权限
     back_perm: 0550    # 已绕接备份的文件权限
-    dir_perm: 0650     # 日志目录权限
+    dir_perm: 0750     # 日志目录权限
     size: 1M           # 当超过此值进行绕接备份
     backups: 5         # 绕接备份的个数
     #async: true       # 是否启动异步
@@ -89,7 +89,7 @@ outputs:
     file: log/rf2.log
     file_perm: 0640
     back_perm: 0550
-    dir_perm: 0650
+    dir_perm: 0750
     pattern: 2006-01-02   # 日期绕接备份的格式
     backups: 5
     #async: true
