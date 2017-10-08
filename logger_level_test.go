@@ -3,7 +3,7 @@ package log
 import (
 	"testing"
 
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLevel(t *testing.T) {

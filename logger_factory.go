@@ -32,7 +32,7 @@ func (f *factory) GetLogger(name string) Logger {
 	if !ok {
 		l = f.createLogger(name, f.getParent(name))
 		if ops, lvl, err := f.manager.GetLoggerOutputs(name); err != nil {
-			log.Println("create logger error, ", err)
+			log.Println("WARN: ", err)
 		} else {
 			l.SetLevel(lvl)
 			l.SetOutputs(ops)

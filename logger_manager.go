@@ -50,24 +50,24 @@ func (m *defManager) GetLoggerOutputs(name string) (ops []Output, lvl Level, err
 	defer m.Unlock()
 	lc := m.config.GetCfgLogger(name)
 	if lc == nil {
-		return nil, lvl, fmt.Errorf("Not find logger.name[%s] config", name)
+		return nil, lvl, fmt.Errorf("not find logger.name[%s] config", name)
 	}
 	lvl = LevelFrom(lc.Level)
 
 	for _, opid := range lc.OutputNames {
 		opcfg := m.config.GetCfgOutput(opid)
 		if opcfg == nil {
-			return nil, lvl, fmt.Errorf("Not find output.name[%s] config", opid)
+			return nil, lvl, fmt.Errorf("not find output.name[%s] config", opid)
 		}
 
 		fmtcfg := m.config.GetCfgFormat(opcfg.FormatName())
 		if fmtcfg == nil {
-			return nil, lvl, fmt.Errorf("Not find format.name[%s] config", opcfg.FormatName())
+			return nil, lvl, fmt.Errorf("not find format.name[%s] config", opcfg.FormatName())
 		}
 
 		fmtcreator, ok := m.formatterCreators[fmtcfg.Type()]
 		if !ok {
-			return nil, lvl, fmt.Errorf("Not find registered format.type[%s] creator", fmtcfg.Type())
+			return nil, lvl, fmt.Errorf("not find registered format.type[%s] creator", fmtcfg.Type())
 		}
 
 		fmtt, ok := m.formats[fmtcfg.Name()]
@@ -80,7 +80,7 @@ func (m *defManager) GetLoggerOutputs(name string) (ops []Output, lvl Level, err
 
 		opcreator, ok := m.outputCreators[opcfg.Type()]
 		if !ok {
-			return nil, Uninitialized, fmt.Errorf("Not find registered output.type[%s] creator", opcfg.Type())
+			return nil, Uninitialized, fmt.Errorf("not find registered output.type[%s] creator", opcfg.Type())
 		}
 
 		op, ok := m.outputs[opcfg.Name()]
