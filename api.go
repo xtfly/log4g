@@ -210,6 +210,12 @@ type Manager interface {
 
 	// Close all output and wait all event write to outputs.
 	Close()
+
+	addConfigNotify(cn configNotify)
+}
+
+type configNotify interface {
+	notify()
 }
 
 // -----------------------------

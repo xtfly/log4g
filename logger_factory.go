@@ -1,7 +1,6 @@
 package log
 
 import (
-	"log"
 	"sync"
 )
 
@@ -32,7 +31,7 @@ func (f *factory) GetLogger(name string) Logger {
 	if !ok {
 		l = f.createLogger(name, f.getParent(name))
 		if ops, lvl, err := f.manager.GetLoggerOutputs(name); err != nil {
-			log.Println("WARN: ", err)
+			//log.Println("WARN: ", err)
 		} else {
 			l.SetLevel(lvl)
 			l.SetOutputs(ops)
@@ -87,12 +86,25 @@ func (f *factory) getRootLogger() *defLogger {
 	return f.root
 }
 
+func (f *factory) notify() {
+	f.Lock()
+	defer f.Unlock()
+	for _, k := range f.loggers {
+		if ops, lvl, err := f.manager.GetLoggerOutputs(k.name); err != nil {
+			//log.Println("WARN: ", err)
+		} else {
+			k.SetLevel(lvl)
+			k.SetOutputs(ops)
+		}
+	}
+}
+
 // newFactory return a instance of Factory
 func newFactory(manager Manager) Factory {
 	factory := &factory{
 		loggers: make(map[string]*defLogger),
 		manager: manager,
 	}
-
+	manager.addConfigNotify(factory)
 	return factory
 }

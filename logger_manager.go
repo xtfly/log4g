@@ -14,12 +14,13 @@ import (
 )
 
 type defManager struct {
-	sync.Mutex
+	sync.RWMutex
 	formatterCreators map[string]FormatterFuncCreator // key: type
 	outputCreators    map[string]OutputFuncCreator    // key: type
 	formats           map[string]Formatter            // key: name
 	outputs           map[string]Output               // key: name
 	config            *Config
+	cfgNotifys        []configNotify
 }
 
 func newManager() Manager {
@@ -108,8 +109,6 @@ func (m *defManager) LoadConfigFile(file string) error {
 func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {
 	ext = strings.ToLower(ext)
 	err = fmt.Errorf("not support config file type %s", ext)
-	m.Lock()
-	defer m.Unlock()
 
 	cfg := &Config{}
 	if ext == "yaml" || ext == "yml" {
@@ -117,18 +116,22 @@ func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {
 	} else if ext == "json" {
 		err = json.Unmarshal(bs, cfg)
 	}
+
 	return m.setConfig(cfg)
 }
 
 func (m *defManager) setConfig(cfg *Config) error {
 	// TODO check the output & format relationship in config
+	m.Lock()
 	m.config = cfg
+	m.Unlock()
+	for _, cn := range m.cfgNotifys {
+		cn.notify()
+	}
 	return nil
 }
 
 func (m *defManager) SetConfig(cfg *Config) error {
-	m.Lock()
-	defer m.Unlock()
 	return m.setConfig(cfg)
 }
 
@@ -138,4 +141,8 @@ func (m *defManager) Close() {
 		v.Close()
 	}
 	m.Unlock()
+}
+
+func (m *defManager) addConfigNotify(cn configNotify) {
+	m.cfgNotifys = append(m.cfgNotifys, cn)
 }
