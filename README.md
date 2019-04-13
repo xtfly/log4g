@@ -4,43 +4,49 @@ log4g is a logging framework that's interface like java log4j. it's designed for
 
 ## Brief Introduce
 
-log4g是一个使用接口与log4j相似的Go语言实现，专为可配置和可扩展而设计的日志框架，它涉及到三个概念：
+core concepts:
 
- - formatter：日志格式化，通过`name`来标识，`type`表示格式化器的类型。
- - output: 日志输出目标，通过`name`来标识，`type`表示输出目标的类型，一个output关联一个formatter。
- - logger：日志实例，通过`name`来标识，每个logger可以关联到多个output。
+ - Formatter：the logger formatter which is identified by `name` attribute, and `type` attribute represents the type of formatter.
+ - Output: the logger output target which is identified by `name` attribute, and `type` attribute represents the type of the output target. An output is associated with a formatter.
+ - Logger：the logger instances which is identified by `name` attribute. Each logger can be associated with multiple outputs.
 
 ## logger
 
-logger name支持按`/`与`.`来分割名称。例如名为`module`是`module/submodule`的父Logger,
-当子Logger没有设置时，会共享使用父Logger的Output与Level。
+the logger name separating by `/` and `.`, for example, the logger named `module` is the parent logger named `module/submodule`. When the child logger is not set, it' configuration of Output and Level will inherit the parent logger configuration.
 
-logger level支持All<Trace<Debug<Info<Warn<Error<Critical<Off，八个级别，可在配置文件配置输出的级别，配置时不区分大小写。
+Logger level are: All<Trace<Debug<Info<Warn<Error<Critical<Off
 
- **TBD**
+The output level of one logger can be configured in the configuration file without case discrimination.
 
 ## formatter
 
-默认提供按`%{verb}`解析的layout的Formatter，其类型为`format`。
+the layout of default Formatter is to parse `%{verb}` format string, the type attribute of it is `text`.
 
-支持verb的格式为：`%{verbName:fmtstr}``，其中`verbName`为字段名称，`fmtstr`为字段格式化输出定义，支持标准的Go的format格式。
-如`%{pid:05d}``,其中`05d`表示至少输出5个字符，以0补充。例如输出日志格式为`%{module}|%{lvl:5s}>>%{msg}`。
+the verb format：`%{verbName:fmtstr}`:
+ - `verbName` is a field name 
+ - `fmtstr` is a format output definitions for the field, it supports standard Go format lattices
 
- - %{pid}: 输出进程ID
- - %{program}：输出程序名
- - %{module}：输出日志名称
- - %{msg}：输出Logger.Debug(...)与Debugf(...)等类似方法的内容
- - %{level}：输出日志级别，大全写，如DEBUG
- - %{lvl}：输出日志级别的三个字母的缩写，大全写，如
- - %{line}：输出打印日志所在行数
- - %{longfile}：输出打印日志所在文件路径，如 /a/b/c/d.go
- - %{shortfile}：输出打印日志所在文件名，如d.go
- - %{longpkg}：输出打印日志所在package全路径名称，如github.com/xtfly/log4g
- - %{shortpkg}：输出打印日志所在package名称，如log4g
- - %{longfunc}：输出打印日志所在函数或方法全名，如littleEndian.PutUint32
- - %{shortfunc}：输出打印日志所在函数或方法名，如PutUint32
- - %{time}：输出当前时间，如%{time:2006-01-02T15:04:05.999Z-07:00}
- - %{xxx}：当使用logger.WithCtx与logger.WithFields接口，xxx表示从输出的字段列表中搜索到内容。
+for example: `%{pid:05d}`, `05d` means that at least five characters are output, supplemented by `0` . 
+
+anothe example: `%{module}|%{lvl:5s}>>%{msg}`
+ 
+all support verb as follow: 
+
+ - %{pid}: The process id (int)
+ - %{program}: The basename of os.Args[0] (string)
+ - %{module}: The logger name
+ - %{msg}: The content by using Debug(...) or Debugf(...) methods or others of a logger
+ - %{level}: The uppercase loglevel name, eg. DEBUG
+ - %{lvl}: The uppercase short log level name, eg. DBG
+ - %{line}: The line number
+ - %{longfile}: The full file path，eg. /a/b/c/d.go
+ - %{shortfile}: The file basename, eg. d.go
+ - %{longpkg}: The full package name, eg. github.com/xtfly/log4g
+ - %{shortpkg}: The package basename, eg. log4g
+ - %{longfunc}: The full function name, eg. littleEndian.PutUint32
+ - %{shortfunc}: The base function name, eg. PutUint32
+ - %{time}: The time when log occurred，eg. %{time:2006-01-02T15:04:05.999Z-07:00}
+ - %{xxx}: When using the WithCtx or WithFields method of a logger, `xxx` represents searching for content from the list of output fields.
 
 ## output
 
@@ -48,14 +54,14 @@ logger level支持All<Trace<Debug<Info<Warn<Error<Critical<Off，八个级别，
 
 ## config
 
-配置文件格式支持yaml与json格式，定义请参考[api.go](api.go)中`Config`结构体
+The configuration file format supports YAML and JSON formats. For definitions, refer to the `Config` structure in [logger_api.go](api/logger_api.go).
 
 Format:
 
 ```
 formats:
-  - name: f1     # format的名称，用于output引用
-    type: text # 当前只能为text
+  - name: f1     # Name of format for output reference
+    type: text   # Currently only text
     layout: "%{time} %{level} %{module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"
 ```
 
@@ -63,34 +69,34 @@ Output:
 
 ```
 outputs:
-  - name: c1          # output的名称
-    type: console     # 表示输出到console
-    format: f1        # 引用的formatter名称
-    #async: true      # 是否启动异步
-    #queue_size: 100  # 异步时，队列的长度
-    #batch_num: 10    # 异步时，批量10条一起提交到文件
+  - name: c1          # Name of output for logger reference
+    type: console     # Ouput log content into console
+    format: f1        # Referenced formatter name
+    #async: true      # Whether to start asynchrony ouput log content
+    #queue_size: 100  # The length of the queue when enable asynchronous
+    #batch_num: 10    # Batch 10 items submitted to the target together when enable asynchronous
     #threshold: info
   - name: r1
-    type: size_rolling_file # 绕接日志的类型
+    type: size_rolling_file # The type of rolling 
     format: f1
-    file: log/rf.log   # 正在写的文件
-    file_perm: 0640    # 正在写的文件权限
-    back_perm: 0550    # 已绕接备份的文件权限
-    dir_perm: 0750     # 日志目录权限
-    size: 1M           # 当超过此值进行绕接备份
-    backups: 5         # 绕接备份的个数
-    #async: true       # 是否启动异步
-    #queue_size: 100   # 异步时，队列的长度
-    #batch_num: 10     # 异步时，批量10条一起提交到文件
+    file: log/rf.log   # The current written output file name
+    file_perm: 0640    # The file permissions being written
+    back_perm: 0550    # The file permissions that have been backup rolling
+    dir_perm: 0750     # The direction permissions
+    size: 1M           # When this value is exceeded, make a backup rolling
+    backups: 5         # The number of backup rolling
+    #async: true       # Whether to start asynchrony ouput log content
+    #queue_size: 100   # The length of the queue when enable asynchronous
+    #batch_num: 10     # Batch 10 items submitted to the target together when enable asynchronous
     #threshold: info
   - name: r2
-    type: time_rolling_file # 绕接日志的类型
+    type: time_rolling_file # The type of rolling
     format: f1
     file: log/rf2.log
     file_perm: 0640
     back_perm: 0550
     dir_perm: 0750
-    pattern: 2006-01-02   # 日期绕接备份的格式
+    pattern: 2006-01-02   # The date format for backup rolling
     backups: 5
     #async: true
     #queue_size: 100
@@ -110,7 +116,7 @@ import "github.com/xtfly/log4g"
 
 func main() {
 
-	_ := log.GetManager().LoadConfigFile("log4g.yml")
+	_ := log.GetManager().LoadConfigFile("log4g.yaml")
 
 	dlog := log.GetLogger("name")
 	dlog.Debug("message")
@@ -125,26 +131,29 @@ func main() {
 
 ## Task List
 
-- [x] 日志框架
+- [x] Logger formwork
 - [x] Formatter
-  - [x] Text: 按%{verb}解析layout
+  - [x] Text: parse %{verb} layout
 - [x] Output
-  - [x] Console输出
-     - [x] 同步
-     - [x] 异步
-  - [ ] 基于大小绕接文件输出
-     - [x] 同步
-     - [x] 异步
-     - [ ] 备份压缩（未验证）
-  - [ ] 基于日期绕接文件输出
-     - [x] 同步
-     - [x] 异步
-     - [ ] 备份压缩（未验证）
-  - [x] 输出到syslog
-     - [x] 同步
-- [ ] 配置参数检查
-- [ ] 更多的测试覆盖
+  - [x] Console
+     - [x] sync
+     - [x] async
+  - [x] Rolling file by size
+     - [x] sync
+     - [x] async
+     - [ ] backup and compress [not test]
+  - [x] Rolling file by date
+     - [x] sync
+     - [x] async
+     - [ ] backup and compress [not test]
+  - [x] Syslog
+     - [x] sync
+- [x] validate configuration parameters
+- [ ] more test case
 
 ## Thanks
 
-本项目部分代码继承了[seelog](https://github.com/cihub/seelog)与[go-logging](https://github.com/op/go-logging)的代码，在此表示感谢。
+Thanks to the opensource project for this project inherits some code of them:
+
+ - [seelog](https://github.com/cihub/seelog)
+ - [go-logging](https://github.com/op/go-logging)

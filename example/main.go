@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/xtfly/log4g"
+	log "github.com/xtfly/log4g"
 )
 
 func main() {
 
 	err := log.GetManager().LoadConfigFile("log4g.yaml")
-	fmt.Errorf("%v", err)
+	fmt.Printf("%v", err)
 
 	dlog := log.GetLogger("a/b")
 	dlog.Debug("message")
