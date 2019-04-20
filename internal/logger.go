@@ -187,9 +187,9 @@ func (l *defWriter) write(name string, skip int, lvl api.Level, fmt string, args
 	}
 
 	if l.logger.callerInfoFlag == ciFuncFlag {
-		getCallInfo(evt, true)
+		getCallerInfo(evt, true)
 	} else if l.logger.callerInfoFlag == ciFileFlag {
-		getCallInfo(evt, false)
+		getCallerInfo(evt, false)
 	}
 
 	// dispatch event to all outputs

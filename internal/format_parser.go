@@ -221,43 +221,43 @@ func lvlFormatFunc(evt *api.Event, _ *part) interface{} {
 
 // %{line}  line number: 30
 func lineFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, false)
+	ci := getCallerInfo(evt, false)
 	return ci.line
 }
 
 // %{longfile}  Full file name: /a/b/c/d.go
 func longfileFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, false)
+	ci := getCallerInfo(evt, false)
 	return ci.file
 }
 
 // %{shortfile} Final file name element: d.go
 func shortfileFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, false)
+	ci := getCallerInfo(evt, false)
 	return filepath.Base(ci.file)
 }
 
 // %{longpkg}  Full package path, eg. github.com//xtfy/log4g
 func longpkgFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, true)
+	ci := getCallerInfo(evt, true)
 	return ci.pkg
 }
 
 // %{shortpkg}  Base package path, eg. log4g
 func shortpkgFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, true)
+	ci := getCallerInfo(evt, true)
 	return path.Base(ci.pkg)
 }
 
 // %{longfunc}  Full function name, eg. littleEndian.PutUint32
 func longfuncFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, true)
+	ci := getCallerInfo(evt, true)
 	return ci.fun
 }
 
 // %{shortfunc} Base function name, eg. PutUint32
 func shortfuncFormatFunc(evt *api.Event, _ *part) interface{} {
-	ci := getCallInfo(evt, true)
+	ci := getCallerInfo(evt, true)
 	i := strings.LastIndex(ci.fun, ".")
 	return ci.fun[i+1:]
 }

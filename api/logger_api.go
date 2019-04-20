@@ -10,22 +10,6 @@ import (
 // --------Logger API-----------
 // -----------------------------
 
-// Level type for a logger
-type Level int
-
-// Log levels
-const (
-	Uninitialized Level = iota
-	All
-	Trace
-	Debug
-	Info
-	Warn
-	Error
-	Critical
-	Off
-)
-
 // Writer for a logger
 type Writer interface {
 	// Tracef formats message according to format specifier
@@ -80,7 +64,7 @@ type Writer interface {
 	Printf(lvl Level, fmt string, args ...interface{})
 }
 
-// Field is logger message extension field
+// Field is logging message extend field
 type Field struct {
 	Key   string
 	Value interface{}
@@ -109,18 +93,19 @@ type Logger interface {
 	// Level return the level of the logger
 	Level() Level
 
+	// SetCallerSkip to set the caller stack level will being skip
 	SetCallerSkip(skip int)
 
 	Writer
 }
 
-// Factory represents ...
+// Factory create or retrieve a logger by given name
 type Factory interface {
 	GetLogger(name string) Logger
 }
 
-// Event is logging event which is created by logger and will send to Output,
-// The Output implementer calls the Formatter interface to format the log output based on the event.
+// Event which is created when you logging and will send to Output,
+// The Output implementer uses the Formatter to format the event to a logging content.
 type Event struct {
 	Format    string
 	Arguments []interface{}
@@ -148,7 +133,7 @@ func (e *Event) Message() string {
 // ------Formatter API----------
 // -----------------------------
 
-// Formatter represents ...
+// Formatter formats events to logging content
 type Formatter interface {
 	// Format logging event to bytes
 	Format(e *Event) []byte
@@ -159,9 +144,6 @@ type Formatter interface {
 	// 2: func and above 1
 	CallerInfoFlag() int
 }
-
-// FormatterFuncCreator ...
-type FormatterFuncCreator func(cfg CfgFormat) (Formatter, error)
 
 // -----------------------------
 // ---------Output API----------
@@ -175,119 +157,9 @@ type Output interface {
 	// SetFormatter set a formatter to the output
 	SetFormatter(f Formatter)
 
-	// CallerInfoFlag ...
+	// CallerInfoFlag return the caller info flag by formatter
 	CallerInfoFlag() int
 
 	// Close the output and quit the loop routine
 	Close()
-}
-
-// OutputFuncCreator ...
-type OutputFuncCreator func(cfg CfgOutput) (Output, error)
-
-// -----------------------------
-// ---------Manager API---------
-// -----------------------------
-
-// Manager ...
-type Manager interface {
-	// RegisterFormatterCreator ..
-	RegisterFormatterCreator(stype string, f FormatterFuncCreator)
-
-	// RegisterOutputCreator ..
-	RegisterOutputCreator(stype string, o OutputFuncCreator)
-
-	// GetLoggerOutputs ..
-	GetLoggerOutputs(name string) (ops []Output, lvl Level, err error)
-
-	// LoadConfigFile ..
-	LoadConfigFile(file string) error
-
-	// LoadConfig ..
-	LoadConfig(bs []byte, ext string) error
-
-	// SetConfig ..
-	SetConfig(cfg *Config) error
-
-	// Close all output and wait all event write to outputs.
-	Close()
-}
-
-// -----------------------------
-// ---------Config API----------
-// -----------------------------
-
-// Config ...
-type Config struct {
-	Formats []CfgFormat `yaml:"formats" json:"formats"`
-	Outputs []CfgOutput `yaml:"outputs" json:"outputs"`
-	Loggers []CfgLogger `yaml:"loggers" json:"loggers"`
-}
-
-// GetCfgLogger return the point of CfgLogger which matched by name
-func (c *Config) GetCfgLogger(name string) *CfgLogger {
-	for _, l := range c.Loggers {
-		if l.Name == name {
-			return &l
-		}
-	}
-	return nil
-}
-
-// GetCfgOutput return the point of CfgOutput which matched by name
-func (c *Config) GetCfgOutput(name string) CfgOutput {
-	for _, l := range c.Outputs {
-		if l.Name() == name {
-			return l
-		}
-	}
-	return nil
-}
-
-// GetCfgFormat return the point of CfgFormat which matched by name
-func (c *Config) GetCfgFormat(name string) CfgFormat {
-	for _, l := range c.Formats {
-		if l.Name() == name {
-			return l
-		}
-	}
-	return nil
-}
-
-// CfgLogger ...
-type CfgLogger struct {
-	Name        string   `yaml:"name" json:"name"`
-	Level       string   `yaml:"level" json:"level"`
-	OutputNames []string `yaml:"outputs" json:"outputs"`
-}
-
-// CfgOutput ...
-type CfgOutput map[string]string
-
-// Name return the name of Output
-func (c CfgOutput) Name() string {
-	return c["name"]
-}
-
-// Type return the type of Output
-func (c CfgOutput) Type() string {
-	return c["type"]
-}
-
-// FormatName return the format name
-func (c CfgOutput) FormatName() string {
-	return c["format"]
-}
-
-// CfgFormat ...
-type CfgFormat map[string]string
-
-// Name return the name of Format
-func (c CfgFormat) Name() string {
-	return c["name"]
-}
-
-// Type return the type of Format
-func (c CfgFormat) Type() string {
-	return c["type"]
 }

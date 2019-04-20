@@ -26,7 +26,7 @@ func init() {
 	signal.Notify(listenSig, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-listenSig
-		GetManager().Close()
+		gmanager.Close()
 	}()
 }
 

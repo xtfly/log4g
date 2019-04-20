@@ -2,6 +2,22 @@ package api
 
 import "strings"
 
+// Level type for a logger
+type Level int
+
+// Log levels
+const (
+	Uninitialized Level = iota
+	All
+	Trace
+	Debug
+	Info
+	Warn
+	Error
+	Critical
+	Off
+)
+
 var levelStrings = map[Level]string{
 	All:      "ALL",
 	Trace:    "TRACE",

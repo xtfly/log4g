@@ -22,7 +22,7 @@ type callerInfo struct {
 	pc   uintptr
 }
 
-func getCallInfo(evt *api.Event, needFun bool) *callerInfo {
+func getCallerInfo(evt *api.Event, needFun bool) *callerInfo {
 	var ci *callerInfo
 	v := evt.Ctx.Value("__caller_info")
 	if v != nil {

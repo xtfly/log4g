@@ -47,7 +47,7 @@ func (o *syslogOutput) SetFormatter(f api.Formatter) {
 	o.f = f
 }
 
-// CallerInfoFlag ...
+// CallerInfoFlag return the formater max caller flag index
 func (o *syslogOutput) CallerInfoFlag() int {
 	if o.f != nil {
 		return o.f.CallerInfoFlag()
@@ -55,14 +55,14 @@ func (o *syslogOutput) CallerInfoFlag() int {
 	return ciNoneFlog
 }
 
-// Close ...
+// Close the syslog writer related to this output
 func (o *syslogOutput) Close() {
 	if o.w != nil {
 		o.w.Close()
 	}
 }
 
-// NewSyslogOutput return a output instance that it print message to syslog
+// NewSyslogOutput return a output instance that output message to syslog
 func NewSyslogOutput(cfg api.CfgOutput) (api.Output, error) {
 	w, err := syslog.New(syslog.LOG_CRIT, cfg["prefix"])
 	if err != nil {

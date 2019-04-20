@@ -29,14 +29,14 @@ func NewTextFormatter(cfg api.CfgFormat) (df api.Formatter, err error) {
 	return
 }
 
-// Format ...
+// Format a logger event to byte array
 func (f *textFormatter) Format(e *api.Event) []byte {
 	var buf bytes.Buffer
 	f.strFormatter.Format(e, &buf)
 	return buf.Bytes()
 }
 
-// CallerInfoFlag ...
+// CallerInfoFlag return the max caller flag index
 func (f *textFormatter) CallerInfoFlag() int {
 	ret := 0
 	for _, v := range f.strFormatter.parts {

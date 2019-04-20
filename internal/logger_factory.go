@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	// rootLoggerName is the name of the root logger.
 	rootLoggerName    = "root"
 	packageSepBySlash = '/'
 	packageSepByDot   = '.'
