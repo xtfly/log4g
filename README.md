@@ -85,6 +85,8 @@ outputs:
     dir_perm: 0750     # The direction permissions
     size: 1M           # When this value is exceeded, make a backup rolling
     backups: 5         # The number of backup rolling
+    #archive: gzip     # The archive type of the backup logs, zip or gzip
+    #name_mode: prefix # The backup name type, prefix or postfix, log/rf.log->log/rf.log.1 or log/rf.log->log/rf.1.log
     #async: true       # Whether to start asynchrony ouput log content
     #queue_size: 100   # The length of the queue when enable asynchronous
     #batch_num: 10     # Batch 10 items submitted to the target together when enable asynchronous
@@ -98,6 +100,8 @@ outputs:
     dir_perm: 0750
     pattern: 2006-01-02   # The date format for backup rolling
     backups: 5
+    #archive: gzip
+    #name_mode: prefix
     #async: true
     #queue_size: 100
     #batch_num: 10
@@ -116,10 +120,30 @@ import "github.com/xtfly/log4g"
 
 func main() {
 
-	_ := log.GetManager().LoadConfigFile("log4g.yaml")
+	// optional, load config from a file
+	// err := log.GetManager().LoadConfigFile("log4g.yaml")
+	// fmt.Printf("%v", err)
 
-	dlog := log.GetLogger("name")
+	// optional, set config by code
+	//cfg := &api.Config{
+	//	Loggers: []api.CfgLogger{
+	//		{Name: "root", Level: "all", OutputNames: []string{"c1"}},
+	//	},
+	//	Formats: []api.CfgFormat{
+	//		{"type": "text", "name": "f1", "layout": "%{time} %{level} %{module} %{pid:6d} >> %{msg} (%{longfile}:%{line}) \n"},
+	//	},
+	//	Outputs: []api.CfgOutput{
+	//		{"type": "console", "name": "c1", "format": "f1"},
+	//	},
+	//}
+	//_ = log.GetManager().SetConfig(cfg)
+
+	dlog := log.GetLogger("a/b")
 	dlog.Debug("message")
+	dlog.Info("info message")
+
+	// optional, manually close manager
+	// log.GetManager().Close()
 
 }
 ```
@@ -141,11 +165,11 @@ func main() {
   - [x] Rolling file by size
      - [x] sync
      - [x] async
-     - [ ] backup and compress [not test]
+     - [x] backup and compress
   - [x] Rolling file by date
      - [x] sync
      - [x] async
-     - [ ] backup and compress [not test]
+     - [x] backup and compress
   - [x] Syslog
      - [x] sync
 - [x] validate configuration parameters
@@ -153,7 +177,7 @@ func main() {
 
 ## Thanks
 
-Thanks to the opensource project for this project inherits some code of them:
+Thanks to the follow open source project for this project port some code from them:
 
  - [seelog](https://github.com/cihub/seelog)
  - [go-logging](https://github.com/op/go-logging)

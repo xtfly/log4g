@@ -22,6 +22,20 @@ func init() {
 	gmanager.RegisterOutputCreator(typeRollingTime, NewRollingOutput)
 	gmanager.RegisterOutputCreator(typeSyslog, NewSyslogOutput)
 
+	// default config
+	cfg := &api.Config{
+		Loggers: []api.CfgLogger{
+			{Name: "root", Level: "all", OutputNames: []string{"c1"}},
+		},
+		Formats: []api.CfgFormat{
+			{"type": "text", "name": "f1", "layout": "%{time}|%{level:-5s}|%{pid:6d}|%{module} >> %{msg} (%{longfunc}@%{longpkg}/%{shortfile}:%{line}) \n"},
+		},
+		Outputs: []api.CfgOutput{
+			{"type": "console", "name": "c1", "format": "f1"},
+		},
+	}
+	_ = gmanager.SetConfig(cfg)
+
 	listenSig := make(chan os.Signal, 1)
 	signal.Notify(listenSig, os.Interrupt, syscall.SIGTERM)
 	go func() {

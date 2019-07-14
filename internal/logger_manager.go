@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"strings"
 	"sync"
@@ -11,10 +12,9 @@ import (
 	"path"
 
 	"github.com/xtfly/log4g/api"
-	"gopkg.in/yaml.v2"
 )
 
-type configNotify interface {
+type configNotification interface {
 	notify()
 }
 
@@ -25,7 +25,7 @@ type defManager struct {
 	formats           map[string]api.Formatter            // key: name
 	outputs           map[string]api.Output               // key: name
 	config            *api.Config
-	cfgNotifys        []configNotify
+	cfgNotifications  []configNotification
 }
 
 func newManager() api.Manager {
@@ -126,18 +126,20 @@ func (m *defManager) LoadConfig(bs []byte, ext string) (err error) {
 }
 
 func (m *defManager) setConfig(cfg *api.Config) error {
-	m.validatConfig(cfg)
+	if err := m.validateConfig(cfg); err != nil {
+		return err
+	}
 
 	m.Lock()
 	m.config = cfg
 	m.Unlock()
-	for _, cn := range m.cfgNotifys {
+	for _, cn := range m.cfgNotifications {
 		cn.notify()
 	}
 	return nil
 }
 
-func (m *defManager) validatConfig(cfg *api.Config) (err error) {
+func (m *defManager) validateConfig(cfg *api.Config) (err error) {
 	// check the output & format relationship in config
 
 	formats := make(map[string]api.CfgFormat)
@@ -192,6 +194,6 @@ func (m *defManager) Close() {
 	m.Unlock()
 }
 
-func (m *defManager) addConfigNotify(cn configNotify) {
-	m.cfgNotifys = append(m.cfgNotifys, cn)
+func (m *defManager) addConfigNotify(cn configNotification) {
+	m.cfgNotifications = append(m.cfgNotifications, cn)
 }

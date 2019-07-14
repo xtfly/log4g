@@ -299,6 +299,14 @@ var rollingfileWriterTests = []*fileWriterTestCase{
 	createRollingSizeFileWriterTestCase([]string{}, `././log.testlog`, 10, 1, 2, []string{`log.testlog`, `log.testlog.1`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
 	createRollingSizeFileWriterTestCase([]string{`././././log.testlog.9`}, `log.testlog`, 10, 1, 2, []string{`log.testlog`, `log.testlog.10`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
 	createRollingSizeFileWriterTestCase([]string{"././dir/dir/log.testlog.a", "././dir/dir/log.testlog.1b"}, "dir/dir/log.testlog", 10, 1, 2, []string{"dir/dir/log.testlog", "dir/dir/log.testlog.1", "dir/dir/log.testlog.a", "dir/dir/log.testlog.1b"}, rollingNameModePostfix, rollingArchiveNone, true, ""),
-	//createRollingSizeFileWriterTestCase([]string{"log.testlog", "log.testlog.1"}, "log.testlog", 10, 1, 2, []string{"log.testlog", "log.testlog.2", "dir/log.testlog.1.zip"}, rollingNameModePostfix, rollingArchiveZip, true, "dir"),
+	createRollingSizeFileWriterTestCase([]string{}, `././dir/log.testlog`, 10, 10, 1, []string{`dir/log.testlog`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{}, `././dir/log.testlog`, 10, 10, 2, []string{`dir/log.testlog`, `dir/log.testlog.1`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{`././dir/dir/log.testlog.1`}, `dir/dir/log.testlog`, 10, 10, 2, []string{`dir/dir/log.testlog`, `dir/dir/log.testlog.1`, `dir/dir/log.testlog.2`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{`././dir/dir/dir/log.testlog.1`}, `dir/dir/dir/log.testlog`, 10, 1, 2, []string{`dir/dir/dir/log.testlog`, `dir/dir/dir/log.testlog.2`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{}, `././log.testlog`, 10, 1, 2, []string{`log.testlog`, `log.testlog.1`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{`././././log.testlog.9`}, `log.testlog`, 10, 1, 2, []string{`log.testlog`, `log.testlog.10`}, rollingNameModePostfix, rollingArchiveNone, false, ""),
+	createRollingSizeFileWriterTestCase([]string{"././dir/dir/log.testlog.a", "././dir/dir/log.testlog.1b"}, "dir/dir/log.testlog", 10, 1, 2, []string{"dir/dir/log.testlog", "dir/dir/log.testlog.1", "dir/dir/log.testlog.a", "dir/dir/log.testlog.1b"}, rollingNameModePostfix, rollingArchiveNone, true, ""),
+	createRollingSizeFileWriterTestCase([]string{"log.testlog", "log.testlog.1"}, "log.testlog", 10, 1, 2, []string{"log.testlog", "log.testlog.2", "dir/log.testlog.1.zip"}, rollingNameModePostfix, rollingArchiveZip, true, "dir"),
+	createRollingSizeFileWriterTestCase([]string{"log.testlog", "log.testlog.1"}, "log.testlog", 10, 1, 2, []string{"log.testlog", "log.testlog.2", "dir/log.testlog.1.gz"}, rollingNameModePostfix, rollingArchiveGzip, true, "dir"),
 	// ====================
 }

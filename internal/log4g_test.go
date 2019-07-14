@@ -28,7 +28,7 @@ func init() {
 		},
 	}
 
-	gmanager.SetConfig(cfg)
+	_ = gmanager.SetConfig(cfg)
 }
 
 func TestLoggerFormat(t *testing.T) {

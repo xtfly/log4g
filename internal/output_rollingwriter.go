@@ -207,6 +207,8 @@ func newRollingFileWriter(fpath string, apath string) *rollingFileWriter {
 	if len(apath) == 0 {
 		apath = rw.currentDirPath
 	}
+	rw.archivePath = apath
+	println(rw.archivePath)
 
 	rw.dirPerm = defaultDirectoryPermissions
 	rw.filePerm = defaultFilePermissions
